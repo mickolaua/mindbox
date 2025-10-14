@@ -2,7 +2,7 @@ import importlib.util
 import os
 import pkgutil
 from abc import ABC, abstractmethod
-from typing import TypedDict
+from typing import TypedDict, Union
 
 CUR_DIR = os.path.dirname(__file__)
 PLUGIN_FOLDER = os.path.join(os.path.dirname(__file__), "plugins")
@@ -11,13 +11,20 @@ class FigureParams(TypedDict):
     ...
 
 
+class IncorrectFigureParamsError(Exception):
+    ...
+
+
 class Figure(ABC):
+    id: str
+    name: str
+
     @abstractmethod
-    def __assign_params__(self, params: FigureParams) -> FigureParams:
+    def __assign_params__(self, params: FigureParams):
         ...
 
     def create(self, params: FigureParams):
-        self.__params = self.__assign_params__(params)
+        self.__assign_params__(params)
 
     @property
     @abstractmethod
@@ -37,3 +44,11 @@ def load_plugins(plugin_folder: str = PLUGIN_FOLDER) -> list[Figure]:
                 plugins.append(cls_())
     
     return plugins
+
+
+def get_figure_by_id(figure_id: str, params: FigureParams) -> Union[Figure, None]:
+    for fig in load_plugins():
+        if fig.id == figure_id:
+            fig.create(params)
+            return fig
+    return None

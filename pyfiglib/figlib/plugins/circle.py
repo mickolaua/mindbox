@@ -1,8 +1,10 @@
-from figlib.figure import Figure, FigureParams
+from figlib.figure import Figure, FigureParams, IncorrectFigureParamsError
 import math
 
 
 class Circle(Figure):
+    id = "circle"
+    name = "Circle"
 
     def __assign_params__(self, params: FigureParams):
         self._radius = params.get("radius", 0)
@@ -12,7 +14,7 @@ class Circle(Figure):
         try:
             return self._radius
         except AttributeError as e:
-            raise AttributeError(
+            raise IncorrectFigureParamsError(
                 "Possibly no radius attribute was specified at the object creation"
             ) from e
 
